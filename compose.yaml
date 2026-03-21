@@ -13,9 +13,9 @@ services:
     working_dir: /home/copilot/development
     command: ["sleep", "infinity"]
     environment:
-      GH_TOKEN: "${GH_TOKEN:-}"
-      GITHUB_TOKEN: "${GITHUB_TOKEN:-}"
-      COPILOT_GITHUB_TOKEN: "${COPILOT_GITHUB_TOKEN:-}"
+      #GH_TOKEN: "${GH_TOKEN:-}"
+      #GITHUB_TOKEN: "${GITHUB_TOKEN:-}"
+      #COPILOT_GITHUB_TOKEN: "${COPILOT_GITHUB_TOKEN:-}"
       COPILOT_HOST_GH_TOKEN: "${COPILOT_HOST_GH_TOKEN:-}"
       COPILOT_HOST_GH_GIT_PROTOCOL: "${COPILOT_HOST_GH_GIT_PROTOCOL:-https}"
       COPILOT_NTFY_TOPIC: "${COPILOT_NTFY_TOPIC:-}"
