@@ -1,7 +1,9 @@
 #!/usr/bin/env bash
 set -euo pipefail
 
-mkdir -p "${HOME}/.config/gh" "${HOME}/.copilot" /workspace
+development_dir="${DEVELOPMENT_DIR:-${HOME}/development}"
+
+mkdir -p "${HOME}/.config/gh" "${HOME}/.copilot" "${development_dir}"
 
 if ! gh auth status >/dev/null 2>&1 && [[ -n "${COPILOT_HOST_GH_TOKEN:-}" ]]; then
     rm -f "${HOME}/.config/gh/hosts.yml"

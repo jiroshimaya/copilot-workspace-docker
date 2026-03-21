@@ -7,13 +7,17 @@ ARG COPILOT_CLI_VERSION=latest
 
 ENV DEBIAN_FRONTEND=noninteractive \
     PATH="/home/${USERNAME}/.local/bin:${PATH}" \
-    UV_LINK_MODE=copy
+    SHELL="/bin/bash" \
+    UV_LINK_MODE=copy \
+    DEVELOPMENT_DIR="/workspace" \
+    TERM="xterm-256color"
 
 SHELL ["/bin/bash", "-o", "pipefail", "-c"]
 
 RUN apt-get update \
     && apt-get install -y --no-install-recommends \
         bash \
+        build-essential \
         ca-certificates \
         curl \
         git \
@@ -22,6 +26,7 @@ RUN apt-get update \
         less \
         openssh-client \
         procps \
+        tmux \
         zsh \
     && rm -rf /var/lib/apt/lists/*
 
@@ -39,16 +44,16 @@ RUN groupadd --gid "${USER_GID}" "${USERNAME}" \
         --uid "${USER_UID}" \
         --gid "${USER_GID}" \
         --create-home \
-        --shell /bin/zsh \
+        --shell /bin/bash \
         "${USERNAME}"
 
-RUN mkdir -p /workspace /home/"${USERNAME}"/.config/gh /home/"${USERNAME}"/.copilot \
-    && chown -R "${USER_UID}:${USER_GID}" /workspace /home/"${USERNAME}"
+RUN mkdir -p "${DEVELOPMENT_DIR}" /home/"${USERNAME}"/.config/gh /home/"${USERNAME}"/.copilot \
+    && chown -R "${USER_UID}:${USER_GID}" "${DEVELOPMENT_DIR}" /home/"${USERNAME}"
 
 COPY docker/entrypoint.sh /usr/local/bin/docker-entrypoint.sh
 RUN chmod +x /usr/local/bin/docker-entrypoint.sh
 
-WORKDIR /workspace
+WORKDIR ${DEVELOPMENT_DIR}
 USER ${USERNAME}
 ENTRYPOINT ["docker-entrypoint.sh"]
 CMD ["bash"]

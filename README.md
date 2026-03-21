@@ -2,7 +2,7 @@
 
 GitHub Copilot CLI をホストへ直接入れずに試すための、Docker ベースの作業用 workspace です。
 
-このリポジトリは、Copilot CLI / `gh` / `git` / `uv` を含むコンテナを立ち上げ、ホスト側とは bind mount せずに Docker volume へ状態を閉じ込めることを目的にしています。
+このリポジトリは、Copilot CLI / `gh` / `git` / `uv` を含むコンテナを立ち上げ、ホスト側とは bind mount せずに Docker volume へ状態を閉じ込めることを目的にしています。`fictional-scientists` 側で使っていた開発向け設定もなるべく揃え、`bash` を既定シェルにしつつ `tmux` やビルド系ツールも同梱しています。
 
 ## 含まれるもの
 
@@ -70,6 +70,8 @@ uv sync --frozen --group dev
 - `git`
 - `uv`
 - `bash` / `zsh`
+- `tmux`
+- `build-essential`
 
 `copilot-cli` は npm パッケージ `@github/copilot` からインストールします。バージョンを固定したい場合は build 時に `COPILOT_CLI_VERSION` を渡してください。
 
