@@ -9,7 +9,7 @@ ENV DEBIAN_FRONTEND=noninteractive \
     PATH="/home/${USERNAME}/.local/bin:${PATH}" \
     SHELL="/bin/bash" \
     UV_LINK_MODE=copy \
-    DEVELOPMENT_DIR="/workspace" \
+    DEVELOPMENT_DIR="/home/${USERNAME}/development" \
     TERM="xterm-256color"
 
 SHELL ["/bin/bash", "-o", "pipefail", "-c"]
@@ -47,7 +47,9 @@ RUN groupadd --gid "${USER_GID}" "${USERNAME}" \
         --shell /bin/bash \
         "${USERNAME}"
 
-RUN mkdir -p "${DEVELOPMENT_DIR}" /home/"${USERNAME}"/.config/gh /home/"${USERNAME}"/.copilot \
+RUN mkdir -p "${DEVELOPMENT_DIR}" "${DEVELOPMENT_DIR}"/worktrees /home/"${USERNAME}"/.config/gh /home/"${USERNAME}"/.copilot \
+    && touch /home/"${USERNAME}"/.bashrc \
+    && printf "%s\n" "alias copilot='copilot --allow-all-tools --bash-env=on --add-dir=../worktrees'" >> /home/"${USERNAME}"/.bashrc \
     && chown -R "${USER_UID}:${USER_GID}" "${DEVELOPMENT_DIR}" /home/"${USERNAME}"
 
 COPY docker/entrypoint.sh /usr/local/bin/docker-entrypoint.sh

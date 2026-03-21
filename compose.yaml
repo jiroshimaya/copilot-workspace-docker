@@ -10,7 +10,7 @@ services:
     init: true
     stdin_open: true
     tty: true
-    working_dir: /workspace
+    working_dir: /home/copilot/development
     command: ["sleep", "infinity"]
     environment:
       GH_TOKEN: "${GH_TOKEN:-}"
@@ -22,7 +22,7 @@ services:
     volumes:
       - type: volume
         source: copilot-workspace
-        target: /workspace
+        target: /home/copilot/development
       - type: volume
         source: copilot-gh-config
         target: /home/copilot/.config/gh
