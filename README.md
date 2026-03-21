@@ -2,15 +2,7 @@
 
 GitHub Copilot CLI をホストへ直接入れずに試すための、Docker ベースの作業用 workspace です。
 
-このリポジトリは、Copilot CLI / `gh` / `git` / `uv` を含むコンテナを立ち上げ、ホスト側とは bind mount せずに Docker volume へ状態を閉じ込めることを目的にしています。`fictional-scientists` 側で使っていた開発向け設定もなるべく揃え、`$HOME/development` を標準作業ディレクトリにしつつ、`bash`・`tmux`・ビルド系ツールを同梱しています。
-
-## 含まれるもの
-
-- `Dockerfile`: 再現可能な実行環境
-- `compose.yaml`: 日常利用の入口
-- `scripts/compose.sh`: ホストの `gh` 認証を引き継いで `docker compose` を呼ぶヘルパー
-- `docker/entrypoint.sh`: 起動時の最小セットアップ
-- `scripts/systemd/copilot-workspace-docker.service.example`: 常駐用の user service サンプル
+このリポジトリは、Copilot CLI / `gh` / `git` / `uv` / `tmux` などを含むコンテナを立ち上げ、ホスト側とは bind mount せずに Docker volume へ状態を閉じ込めることを目的にしています。
 
 ## 前提
 
@@ -52,8 +44,12 @@ cd ~/development
 gh repo clone owner/repository
 cd repository
 
-# Python プロジェクト例
-uv sync --frozen --group dev
+# ブラウザ等でcopilotにログイン
+copilot login
+
+# copilot実行
+# aliasによってyoloモードで実行されるため注意。必要に応じて権限を狭めること。
+copilot
 ```
 
 ## 含めているツール
@@ -64,7 +60,6 @@ uv sync --frozen --group dev
 - `uv`
 - `bash`
 - `tmux`
-- `build-essential`
 
 `copilot-cli` は npm パッケージ `@github/copilot` からインストールします。バージョンを固定したい場合は build 時に `COPILOT_CLI_VERSION` を渡してください。
 
@@ -86,7 +81,9 @@ COPILOT_CLI_VERSION=latest ./scripts/compose.sh build
 - 永続化対象は Docker 管理の `copilot-workspace`, `copilot-gh-config`, `copilot-cli-config` volume に限定します
 - ホストのリポジトリ、`~/.config/gh`、`~/.copilot`、`~/.gitconfig`、`~/.ssh` は既定ではコンテナへ持ち込みません
 - ホスト側で `gh auth login` 済みなら、helper script が token だけを取り出して起動時にコンテナ側 `gh` へ再ログインさせます
-- ホスト側へ影響する経路は、明示的に渡した環境変数とネットワーク通信に絞られます
+- copilot-cliへのログインはコンテナ内で実行する必要があります。
+- copilot-cliはaliasによりyoloモードで実行されますが、本当にそれでよいかは各自の状況に合わせて慎重に判断してください。
+  - ホスト側へ影響する経路は、明示的に渡した環境変数とネットワーク通信に絞られますが、リモートリポジトリの破壊や情報漏洩など悪さはやろうと思えばいくらでもできます。
 - 状態を完全に消したいときは `docker compose down -v` を実行してください
 
 ホストとコンテナの間でファイルを受け渡したいときは、bind mount ではなく `docker compose cp` を使う想定です。
