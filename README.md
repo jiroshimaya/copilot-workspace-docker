@@ -75,10 +75,12 @@ uv sync --frozen --group dev
 
 `copilot-cli` は npm パッケージ `@github/copilot` からインストールします。バージョンを固定したい場合は build 時に `COPILOT_CLI_VERSION` を渡してください。
 
-対話シェルでは、ホストの `~/.bashrc` に合わせて次の alias も入れています。
+対話シェルでは、ホストの `~/.bashrc` に合わせて `BASH_ENV="$HOME/.bashexports"` を設定し、次の alias も入れています。
 
 ```bash
-alias copilot='copilot --allow-all-tools --bash-env=on --add-dir=../worktrees'
+export BASH_ENV="$HOME/.bashexports"
+[ -f "$BASH_ENV" ] && . "$BASH_ENV"
+alias copilot='copilot --yolo --bash-env=on'
 ```
 
 ```bash
@@ -106,7 +108,7 @@ COPILOT_CLI_VERSION=latest ./scripts/copilot-compose.sh build workspace
 
 ## Copilot CLI の通知 hook
 
-このリポジトリには Copilot CLI 用の `preToolUse` / `agentStop` hook 設定を `.github/hooks/notifications.json` として含めています。カレントディレクトリをこのリポジトリにして Copilot CLI を使うと `scripts/notify.sh` が呼ばれ、`ntfy.sh` に push 通知できます。
+このリポジトリには Copilot CLI 用の `preToolUse` / `agentStop` hook 設定を `.github/hooks/notifications.json` として含めています。コンテナ起動時には `docker/copilot-instructions.md` が `$HOME/.copilot/copilot-instructions.md` に同期され、通知関連の環境変数は `$HOME/.bashexports` に export 形式で書き出されます。カレントディレクトリをこのリポジトリにして Copilot CLI を使うと `scripts/notify.sh` が呼ばれ、`ntfy.sh` に push 通知できます。
 
 通知が発生するタイミングは以下です。
 
@@ -122,6 +124,8 @@ export COPILOT_NTFY_PRIORITY="default"
 # デバッグしたいときだけ
 export COPILOT_NTFY_DEBUG_LOG="/tmp/copilot-notify-hook.log"
 ```
+
+これらの環境変数を export した状態で `./scripts/copilot-compose.sh run --rm workspace bash` を起動すると、コンテナ内では `.bashrc` が `BASH_ENV="$HOME/.bashexports"` を設定し、以後の `bash` 実行でも同じ通知設定を引き継げます。
 
 `COPILOT_NTFY_TOPIC` を設定しない場合、通知スクリプトは no-op で終了します。通知送信に失敗しても終了コード 0 のため、Copilot CLI 本体の利用は継続できます。
 
