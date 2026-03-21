@@ -82,6 +82,7 @@ COPILOT_CLI_VERSION=latest ./scripts/compose.sh build
 - 永続化対象は Docker 管理の `copilot-workspace`, `copilot-gh-config`, `copilot-cli-config` volume に限定します
 - ホストのリポジトリ、`~/.config/gh`、`~/.copilot`、`~/.gitconfig`、`~/.ssh` は既定ではコンテナへ持ち込みません
 - ホスト側で `gh auth login` 済みなら、helper script が token だけを取り出して起動時にコンテナ側 `gh` へ再ログインさせます
+- コンテナ起動時には `gh auth setup-git` も実行し、コンテナ内の Git 操作でも `gh` の認証設定を使えるようにします
 - copilot-cliへのログインはコンテナ内で実行する必要があります。
 - copilot-cliはaliasによりyoloモードで実行されますが、本当にそれでよいかは各自の状況に合わせて慎重に判断してください。
   - ホスト側へ影響する経路は、明示的に渡した環境変数とネットワーク通信に絞られますが、リモートリポジトリの破壊や情報漏洩など悪さはやろうと思えばいくらでもできます。
