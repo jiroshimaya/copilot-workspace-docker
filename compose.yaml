@@ -1,0 +1,34 @@
+services:
+  workspace:
+    build:
+      context: .
+      dockerfile: Dockerfile
+      network: host
+      args:
+        COPILOT_CLI_VERSION: "${COPILOT_CLI_VERSION:-latest}"
+    image: copilot-workspace-docker/workspace:local
+    init: true
+    stdin_open: true
+    tty: true
+    working_dir: /workspace
+    command: ["sleep", "infinity"]
+    environment:
+      GH_TOKEN: "${GH_TOKEN:-}"
+      GITHUB_TOKEN: "${GITHUB_TOKEN:-}"
+      COPILOT_GITHUB_TOKEN: "${COPILOT_GITHUB_TOKEN:-}"
+      OPENAI_API_KEY: "${OPENAI_API_KEY:-}"
+    volumes:
+      - type: volume
+        source: copilot-workspace
+        target: /workspace
+      - type: volume
+        source: copilot-gh-config
+        target: /home/copilot/.config/gh
+      - type: volume
+        source: copilot-cli-config
+        target: /home/copilot/.copilot
+
+volumes:
+  copilot-workspace:
+  copilot-gh-config:
+  copilot-cli-config:
