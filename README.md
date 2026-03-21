@@ -48,7 +48,7 @@ cd repository
 copilot login
 
 # copilot実行
-# aliasによってyoloモードで実行されるため注意。必要に応じて権限を狭めること。
+# aliasによってツール実行とパス制限が広く許可された状態で実行されるため注意。必要に応じて権限を狭めること。
 copilot
 ```
 
@@ -69,7 +69,7 @@ copilot
 ```bash
 export BASH_ENV="$HOME/.bashexports"
 [ -f "$BASH_ENV" ] && . "$BASH_ENV"
-alias copilot='copilot --yolo --bash-env=on'
+alias copilot='copilot --allow-all-tools --allow-all-paths --bash-env=on'
 ```
 
 ```bash
@@ -83,7 +83,7 @@ COPILOT_CLI_VERSION=latest ./scripts/compose.sh build
 - ホストのリポジトリ、`~/.config/gh`、`~/.copilot`、`~/.gitconfig`、`~/.ssh` は既定ではコンテナへ持ち込みません
 - ホスト側で `gh auth login` 済みなら、helper script が token だけを取り出して起動時にコンテナ側 `gh` へ再ログインさせます
 - copilot-cliへのログインはコンテナ内で実行する必要があります。
-- copilot-cliはaliasによりyoloモードで実行されますが、本当にそれでよいかは各自の状況に合わせて慎重に判断してください。
+- copilot-cliはaliasにより `--allow-all-tools --allow-all-paths` 付きで実行されます。URL 制限は既定の HTTPS のままですが、それでも本当にこの設定でよいかは各自の状況に合わせて慎重に判断してください。
   - ホスト側へ影響する経路は、明示的に渡した環境変数とネットワーク通信に絞られますが、リモートリポジトリの破壊や情報漏洩など悪さはやろうと思えばいくらでもできます。
 - 状態を完全に消したいときは `docker compose down -v` を実行してください
 
