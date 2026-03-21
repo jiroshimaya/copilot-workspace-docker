@@ -49,7 +49,7 @@ RUN groupadd --gid "${USER_GID}" "${USERNAME}" \
 
 RUN mkdir -p "${DEVELOPMENT_DIR}" "${DEVELOPMENT_DIR}"/worktrees /home/"${USERNAME}"/.config/gh /home/"${USERNAME}"/.copilot \
     && touch /home/"${USERNAME}"/.bashrc \
-    && printf "%s\n" "alias copilot='copilot --allow-all-tools --bash-env=on --add-dir=../worktrees'" >> /home/"${USERNAME}"/.bashrc \
+    && printf "%s\n" "alias copilot='copilot --yolo --bash-env=on'" >> /home/"${USERNAME}"/.bashrc \
     && chown -R "${USER_UID}:${USER_GID}" "${DEVELOPMENT_DIR}" /home/"${USERNAME}"
 
 COPY docker/entrypoint.sh /usr/local/bin/docker-entrypoint.sh
