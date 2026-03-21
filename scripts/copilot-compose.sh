@@ -18,4 +18,27 @@ if gh auth status >/dev/null 2>&1; then
     fi
 fi
 
-exec docker compose -f "${repo_root}/compose.yaml" "$@"
+cmd="${1:-}"
+shift || true
+
+case "${cmd}" in
+    build)
+        exec docker compose -f "${repo_root}/compose.yaml" build "$@"
+        ;;
+    up)
+        exec docker compose -f "${repo_root}/compose.yaml" up -d "$@"
+        ;;
+    exec)
+        exec docker compose -f "${repo_root}/compose.yaml" exec workspace bash "$@"
+        ;;
+    down)
+        exec docker compose -f "${repo_root}/compose.yaml" down "$@"
+        ;;
+    "")
+        echo "使い方: $(basename "$0") {build|up|exec|down} [追加オプション...]" >&2
+        exit 1
+        ;;
+    *)
+        exec docker compose -f "${repo_root}/compose.yaml" "${cmd}" "$@"
+        ;;
+esac
