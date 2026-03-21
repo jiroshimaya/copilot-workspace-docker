@@ -39,4 +39,8 @@ if ! gh auth status >/dev/null 2>&1 && [[ -n "${COPILOT_HOST_GH_TOKEN:-}" ]]; th
         >/dev/null
 fi
 
+if gh auth status >/dev/null 2>&1; then
+    gh auth setup-git >/dev/null
+fi
+
 exec "$@"
