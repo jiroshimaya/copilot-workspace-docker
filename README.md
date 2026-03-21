@@ -57,6 +57,7 @@ copilot
 - `copilot-cli`
 - `gh`
 - `git`
+- `nano`
 - `uv`
 - `bash`
 - `tmux`
@@ -95,4 +96,3 @@ COPILOT_CLI_VERSION=latest ./scripts/compose.sh build
 # コンテナ -> ホスト
 ./scripts/compose.sh cp workspace:/home/copilot/development/output.json ./output.json
 ```
-

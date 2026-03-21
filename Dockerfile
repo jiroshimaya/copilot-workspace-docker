@@ -24,6 +24,7 @@ RUN apt-get update \
         gnupg \
         jq \
         less \
+        nano \
         openssh-client \
         procps \
         tmux \
