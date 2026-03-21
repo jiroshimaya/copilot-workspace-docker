@@ -1,0 +1,29 @@
+name: Update Version Auto
+
+on:
+  push:
+    branches:
+      - main
+    paths:
+      - 'Dockerfile'
+      - 'compose.yaml'
+      - 'docker/**'
+      - 'scripts/**'
+      - '.github/**'
+  workflow_dispatch:
+
+jobs:
+  update-version:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+
+    steps:
+      - uses: actions/checkout@v5
+
+      - name: Fetch Tags
+        run: git fetch --tags
+
+      - name: Update Version
+        run: |
+          bash .github/scripts/update_version.sh -i patch
