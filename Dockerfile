@@ -53,7 +53,7 @@ RUN mkdir -p "${DEVELOPMENT_DIR}" "${DEVELOPMENT_DIR}"/worktrees /home/"${USERNA
     && printf "%s\n" \
         "export BASH_ENV=\"\$HOME/.bashexports\"" \
         "[ -f \"\$BASH_ENV\" ] && . \"\$BASH_ENV\"" \
-        "alias copilot='copilot --yolo --bash-env=on'" \
+        "alias copilot='copilot --allow-all-tools --allow-all-paths --bash-env=on'" \
         >> /home/"${USERNAME}"/.bashrc \
     && chown -R "${USER_UID}:${USER_GID}" "${DEVELOPMENT_DIR}" /home/"${USERNAME}"
 
