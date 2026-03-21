@@ -49,9 +49,14 @@ RUN groupadd --gid "${USER_GID}" "${USERNAME}" \
 
 RUN mkdir -p "${DEVELOPMENT_DIR}" "${DEVELOPMENT_DIR}"/worktrees /home/"${USERNAME}"/.config/gh /home/"${USERNAME}"/.copilot \
     && touch /home/"${USERNAME}"/.bashrc \
-    && printf "%s\n" "alias copilot='copilot --yolo --bash-env=on'" >> /home/"${USERNAME}"/.bashrc \
+    && printf "%s\n" \
+        "export BASH_ENV=\"\$HOME/.bashexports\"" \
+        "[ -f \"\$BASH_ENV\" ] && . \"\$BASH_ENV\"" \
+        "alias copilot='copilot --yolo --bash-env=on'" \
+        >> /home/"${USERNAME}"/.bashrc \
     && chown -R "${USER_UID}:${USER_GID}" "${DEVELOPMENT_DIR}" /home/"${USERNAME}"
 
+COPY docker/copilot-instructions.md /usr/local/share/copilot-workspace/copilot-instructions.md
 COPY docker/entrypoint.sh /usr/local/bin/docker-entrypoint.sh
 RUN chmod +x /usr/local/bin/docker-entrypoint.sh
 
