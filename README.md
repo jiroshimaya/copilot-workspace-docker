@@ -33,6 +33,11 @@ GitHub Copilot CLI をホストへ直接入れずに試すための、Docker ベ
 
 BuildKit 環境によっては build 時だけ DNS 解決に失敗することがあるため、この `compose.yaml` では `build.network: host` を指定しています。これは build 中のネットワーク経路だけをホスト側へ寄せる回避策です。
 
+## ドキュメント
+
+- ADR は `docs/adr/` で管理します
+- 運用ルールとテンプレートは `docs/adr/README.md` を参照してください
+
 ## コンテナ内での作業例
 
 `/home/copilot/development` は Docker volume です。ホストのリポジトリや設定ディレクトリは既定では bind mount しません。必要なものだけコンテナ内で取得してください。
