@@ -24,6 +24,9 @@ GitHub Copilot CLI をホストへ直接入れずに試すための、Docker ベ
 # シェルに入る
 ./scripts/compose.sh exec
 
+# tmux セッションへ入る（あれば再開、なければ新規作成）
+./scripts/compose.sh tmux
+
 # 1 回だけ Copilot CLI を使う
 ./scripts/compose.sh run --rm workspace copilot
 
@@ -33,12 +36,14 @@ GitHub Copilot CLI をホストへ直接入れずに試すための、Docker ベ
 
 BuildKit 環境によっては build 時だけ DNS 解決に失敗することがあるため、この `compose.yaml` では `build.network: host` を指定しています。これは build 中のネットワーク経路だけをホスト側へ寄せる回避策です。
 
+`./scripts/compose.sh tmux` はホスト側から `docker compose exec` とコンテナ内 `tmux new-session -A -s workspace` をまとめて実行します。作業を再開したいときは `exec` よりこちらを使うと、前回の `tmux` セッションへすぐ戻れます。
+
 ## コンテナ内での作業例
 
 `/home/copilot/development` は Docker volume です。ホストのリポジトリや設定ディレクトリは既定では bind mount しません。必要なものだけコンテナ内で取得してください。
 
 ```bash
-./scripts/compose.sh exec
+./scripts/compose.sh tmux
 
 cd ~/development
 gh repo clone owner/repository
@@ -51,6 +56,8 @@ copilot login
 # aliasによってツール実行とパス制限が広く許可された状態で実行されるため注意。必要に応じて権限を狭めること。
 copilot
 ```
+
+素のシェルだけ欲しい場合は、従来どおり `./scripts/compose.sh exec` も使えます。
 
 ## 含めているツール
 
