@@ -6,3 +6,8 @@
 - GitHub CLI を使用してください
 - このリポジトリは Docker workspace 用なので、変更時は `docker compose config` / `docker compose build` / `docker compose run` を使って検証してください
 - コンテナ内の標準作業ディレクトリは `/home/copilot/development` です
+
+## ADR
+
+このリポジトリの重要な設計判断は `docs/adr/` に ADR として保存します。
+- 運用ルール: [`docs/adr/README.md`](../docs/adr/README.md)
