@@ -24,6 +24,9 @@ GitHub Copilot CLI をホストへ直接入れずに試すための、Docker ベ
 # シェルに入る
 ./scripts/compose.sh exec
 
+# root シェルに入る（apt-get で追加インストールしたいとき）
+./scripts/compose.sh root
+
 # tmux セッションへ入る（あれば再開、なければ新規作成）
 ./scripts/compose.sh tmux
 
@@ -58,6 +61,22 @@ copilot
 ```
 
 素のシェルだけ欲しい場合は、従来どおり `./scripts/compose.sh exec` も使えます。
+
+コンテナ内で追加の Debian パッケージを事後インストールしたい場合は、`./scripts/compose.sh root` で root シェルへ入れます。
+
+```bash
+./scripts/compose.sh up
+./scripts/compose.sh root
+
+apt-get update
+apt-get install -y tree
+exit
+
+./scripts/compose.sh exec
+tree --version
+```
+
+`root` は明示的に要求したときだけ使える導線です。通常作業は引き続き `copilot` ユーザーの `exec` / `tmux` を使う前提です。また、ここで行った `apt-get` の変更はコンテナの writable layer に入るため、`docker compose down` や image rebuild の扱いによっては失われる点に注意してください。
 
 ## 含めているツール
 
