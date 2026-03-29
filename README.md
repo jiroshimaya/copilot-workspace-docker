@@ -64,6 +64,7 @@ copilot
 - `copilot-cli`
 - `gh`
 - `git`
+- `libreoffice`
 - `nano`
 - `uv`
 - `bash`

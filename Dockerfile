@@ -24,6 +24,7 @@ RUN apt-get update \
         gnupg \
         jq \
         less \
+        libreoffice \
         nano \
         openssh-client \
         procps \
