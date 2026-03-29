@@ -25,6 +25,7 @@ RUN apt-get update \
         jq \
         less \
         libreoffice \
+        fonts-noto-cjk \
         nano \
         openssh-client \
         procps \
