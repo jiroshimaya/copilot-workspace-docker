@@ -37,11 +37,14 @@ case "${cmd}" in
     tmux)
         exec docker compose -f "${repo_root}/compose.yaml" exec workspace tmux new-session -A -s workspace
         ;;
+    cp)
+        exec docker compose -f "${repo_root}/compose.yaml" cp "$@"
+        ;;
     down)
         exec docker compose -f "${repo_root}/compose.yaml" down "$@"
         ;;
     "")
-        echo "使い方: $(basename "$0") {build|up|exec|root|tmux|down} [追加オプション...]" >&2
+        echo "使い方: $(basename "$0") {build|up|exec|root|tmux|cp|down} [追加オプション...]" >&2
         exit 1
         ;;
     *)
