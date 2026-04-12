@@ -7,7 +7,11 @@ copilot_instructions_source="/usr/local/share/copilot-workspace/copilot-instruct
 copilot_instructions_target="${copilot_config_dir}/copilot-instructions.md"
 bashexports_path="${HOME}/.bashexports"
 
-mkdir -p "${HOME}/.config/gh" "${copilot_config_dir}" "${development_dir}"
+mkdir -p "${HOME}/.config/gh" "${HOME}/.config/uv" "${copilot_config_dir}" "${development_dir}"
+
+if [[ ! -f "${HOME}/.config/uv/uv.toml" ]]; then
+    printf 'native-tls = true\n' > "${HOME}/.config/uv/uv.toml"
+fi
 
 if [[ -f "${copilot_instructions_source}" ]]; then
     install -m 0644 "${copilot_instructions_source}" "${copilot_instructions_target}"
