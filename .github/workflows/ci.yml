@@ -37,7 +37,7 @@ jobs:
             test "$PWD" = "/home/copilot/development"
             test "$DEVELOPMENT_DIR" = "/home/copilot/development"
             test -d "$HOME/development/worktrees"
-            command -v bash tmux gh git uv copilot
+            command -v bash tmux zellij gh git uv copilot
             alias copilot
           '
 

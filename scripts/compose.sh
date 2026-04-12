@@ -37,6 +37,10 @@ case "${cmd}" in
     tmux)
         exec docker compose -f "${repo_root}/compose.yaml" exec workspace tmux new-session -A -s workspace
         ;;
+    zellij)
+        exec docker compose -f "${repo_root}/compose.yaml" exec workspace bash -lc \
+            'zellij attach workspace || exec zellij --session workspace'
+        ;;
     cp)
         exec docker compose -f "${repo_root}/compose.yaml" cp "$@"
         ;;
@@ -44,7 +48,7 @@ case "${cmd}" in
         exec docker compose -f "${repo_root}/compose.yaml" down "$@"
         ;;
     "")
-        echo "使い方: $(basename "$0") {build|up|exec|root|tmux|cp|down} [追加オプション...]" >&2
+        echo "使い方: $(basename "$0") {build|up|exec|root|tmux|zellij|cp|down} [追加オプション...]" >&2
         exit 1
         ;;
     *)
