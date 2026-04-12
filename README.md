@@ -2,7 +2,7 @@
 
 GitHub Copilot CLI をホストへ直接入れずに試すための、Docker ベースの作業用 workspace です。
 
-このリポジトリは、Copilot CLI / `gh` / `git` / `uv` / `zellij` などを含むコンテナを立ち上げ、ホスト側とは bind mount せずに Docker volume へ状態を閉じ込めることを目的にしています。
+このリポジトリは、Copilot CLI / `gh` / `git` / `uv` / `zellij` / `micro` などを含むコンテナを立ち上げ、ホスト側とは bind mount せずに Docker volume へ状態を閉じ込めることを目的にしています。
 
 ## 前提
 
@@ -84,6 +84,7 @@ tree --version
 - `gh`
 - `git`
 - `libreoffice`
+- `micro`
 - `nano`
 - `uv`
 - `bash`
