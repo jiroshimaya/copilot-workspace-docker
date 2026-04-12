@@ -2,7 +2,7 @@
 
 GitHub Copilot CLI をホストへ直接入れずに試すための、Docker ベースの作業用 workspace です。
 
-このリポジトリは、Copilot CLI / `gh` / `git` / `uv` / `tmux` などを含むコンテナを立ち上げ、ホスト側とは bind mount せずに Docker volume へ状態を閉じ込めることを目的にしています。
+このリポジトリは、Copilot CLI / `gh` / `git` / `uv` / `tmux` / `zellij` などを含むコンテナを立ち上げ、ホスト側とは bind mount せずに Docker volume へ状態を閉じ込めることを目的にしています。
 
 ## 前提
 
@@ -30,6 +30,9 @@ GitHub Copilot CLI をホストへ直接入れずに試すための、Docker ベ
 # tmux セッションへ入る（あれば再開、なければ新規作成）
 ./scripts/compose.sh tmux
 
+# zellij セッションへ入る（あれば再開、なければ新規作成）
+./scripts/compose.sh zellij
+
 # 1 回だけ Copilot CLI を使う
 ./scripts/compose.sh run --rm workspace copilot
 
@@ -40,6 +43,8 @@ GitHub Copilot CLI をホストへ直接入れずに試すための、Docker ベ
 BuildKit 環境によっては build 時だけ DNS 解決に失敗することがあるため、この `compose.yaml` では `build.network: host` を指定しています。これは build 中のネットワーク経路だけをホスト側へ寄せる回避策です。
 
 `./scripts/compose.sh tmux` はホスト側から `docker compose exec` とコンテナ内 `tmux new-session -A -s workspace` をまとめて実行します。作業を再開したいときは `exec` よりこちらを使うと、前回の `tmux` セッションへすぐ戻れます。
+
+`./scripts/compose.sh zellij` はコンテナ内で `workspace` セッションへの attach を試し、既存セッションがなければ同名の新規セッションを起動します。`zellij` を使いたい場合は `tmux` と同じ感覚でこちらを使えます。
 
 ## コンテナ内での作業例
 
@@ -88,8 +93,11 @@ tree --version
 - `uv`
 - `bash`
 - `tmux`
+- `zellij`
 
 `copilot-cli` は npm パッケージ `@github/copilot` からインストールします。バージョンを固定したい場合は build 時に `COPILOT_CLI_VERSION` を渡してください。
+
+`zellij` は upstream release の Linux 向け prebuilt binary を取得して入れています。必要なら build 時に `ZELLIJ_VERSION` で固定できます。
 
 対話シェルでは、ホストの `~/.bashrc` に合わせて `BASH_ENV="$HOME/.bashexports"` を設定し、次の alias も入れています。
 
@@ -100,7 +108,7 @@ alias copilot='copilot --allow-all-tools --allow-all-paths --bash-env=on'
 ```
 
 ```bash
-COPILOT_CLI_VERSION=latest ./scripts/compose.sh build
+COPILOT_CLI_VERSION=latest ZELLIJ_VERSION=0.44.1 ./scripts/compose.sh build
 ```
 
 ## 認証情報とセキュリティ方針

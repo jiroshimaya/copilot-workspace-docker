@@ -4,6 +4,7 @@ ARG USERNAME=copilot
 ARG USER_UID=1000
 ARG USER_GID=1000
 ARG COPILOT_CLI_VERSION=latest
+ARG ZELLIJ_VERSION=0.44.1
 
 ENV DEBIAN_FRONTEND=noninteractive \
     PATH="/home/${USERNAME}/.local/bin:${PATH}" \
@@ -32,6 +33,24 @@ RUN apt-get update \
         tmux \
         zsh \
     && rm -rf /var/lib/apt/lists/*
+
+RUN case "$(dpkg --print-architecture)" in \
+        amd64) zellij_arch='x86_64-unknown-linux-musl' ;; \
+        arm64) zellij_arch='aarch64-unknown-linux-musl' ;; \
+        *) echo "unsupported architecture: $(dpkg --print-architecture)" >&2; exit 1 ;; \
+    esac \
+    && zellij_asset="zellij-${zellij_arch}.tar.gz" \
+    && zellij_sha_asset="zellij-${zellij_arch}.sha256sum" \
+    && curl -fsSLo "/tmp/${zellij_asset}" \
+        "https://github.com/zellij-org/zellij/releases/download/v${ZELLIJ_VERSION}/${zellij_asset}" \
+    && curl -fsSLo "/tmp/${zellij_sha_asset}" \
+        "https://github.com/zellij-org/zellij/releases/download/v${ZELLIJ_VERSION}/${zellij_sha_asset}" \
+    && cd /tmp \
+    && tar -xzf "${zellij_asset}" \
+    && expected_zellij_sha="$(awk '{print $1}' "${zellij_sha_asset}")" \
+    && echo "${expected_zellij_sha}  zellij" | sha256sum -c - \
+    && install -m 0755 zellij /usr/local/bin/zellij \
+    && rm -f "/tmp/${zellij_asset}" "/tmp/${zellij_sha_asset}" /tmp/zellij
 
 RUN curl -fsSL https://deb.nodesource.com/setup_22.x | bash - \
     && apt-get update \
