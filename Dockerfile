@@ -27,6 +27,7 @@ RUN apt-get update \
         less \
         libreoffice \
         fonts-noto-cjk \
+        micro \
         nano \
         openssh-client \
         procps \
