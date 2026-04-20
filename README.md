@@ -4,6 +4,8 @@ GitHub Copilot CLI をホストへ直接入れずに試すための、Docker ベ
 
 このリポジトリは、Copilot CLI / `gh` / `git` / `uv` / `zellij` / `micro` などを含むコンテナを立ち上げ、ホスト側とは bind mount せずに Docker volume へ状態を閉じ込めることを目的にしています。
 
+`./scripts/compose.sh` は既定で `COMPOSE_PROJECT_NAME=copilot-workspace-$USER` 相当の project 名を使います。rootful Docker で同じホスト daemon を共有していても、ユーザーごとに volume 名が分かれるため、意図しない workspace の共有や衝突を減らせます。
+
 ## 前提
 
 ホスト側では以下を使える状態にしてください。
@@ -38,6 +40,8 @@ GitHub Copilot CLI をホストへ直接入れずに試すための、Docker ベ
 ```
 
 BuildKit 環境によっては build 時だけ DNS 解決に失敗することがあるため、この `compose.yaml` では `build.network: host` を指定しています。これは build 中のネットワーク経路だけをホスト側へ寄せる回避策です。
+
+project 名を明示的に変えたい場合は、`COMPOSE_PROJECT_NAME` を指定してください。未指定時は `./scripts/compose.sh` が `USER` をもとに安全な文字へ正規化した名前を使います。`docker compose` を直接使う場合も、同じ分離をしたければ `COMPOSE_PROJECT_NAME` を明示してください。
 
 `./scripts/compose.sh zellij` はコンテナ内で `workspace` セッションへの attach を試し、既存セッションがなければ同名の新規セッションを起動します。作業を再開したいときは `exec` よりこちらを使うと、前回の `zellij` セッションへすぐ戻れます。
 
@@ -107,14 +111,14 @@ COPILOT_CLI_VERSION=latest ./scripts/compose.sh build
 ## 認証情報とセキュリティ方針
 
 - コンテナは root ではなく `copilot` ユーザーで動かします
-- 永続化対象は Docker 管理の `copilot-workspace`, `copilot-gh-config`, `copilot-cli-config` volume に限定します
+- 永続化対象は Docker 管理の `copilot-workspace-$USER` project 配下の volume に限定します
 - ホストのリポジトリ、`~/.config/gh`、`~/.copilot`、`~/.gitconfig`、`~/.ssh` は既定ではコンテナへ持ち込みません
 - ホスト側で `gh auth login` 済みなら、helper script が token だけを取り出して起動時にコンテナ側 `gh` へ再ログインさせます
 - コンテナ起動時には `gh auth setup-git` も実行し、コンテナ内の Git 操作でも `gh` の認証設定を使えるようにします
 - copilot-cliへのログインはコンテナ内で実行する必要があります。
 - copilot-cliはaliasにより `--allow-all-tools --allow-all-paths` 付きで実行されます。URL 制限は既定の HTTPS のままですが、それでも本当にこの設定でよいかは各自の状況に合わせて慎重に判断してください。
   - ホスト側へ影響する経路は、明示的に渡した環境変数とネットワーク通信に絞られますが、リモートリポジトリの破壊や情報漏洩など悪さはやろうと思えばいくらでもできます。
-- 状態を完全に消したいときは `docker compose down -v` を実行してください
+- 状態を完全に消したいときは `./scripts/compose.sh down -v` を実行してください
 
 ホストとコンテナの間でファイルを受け渡したいときは、bind mount ではなく `docker compose cp` を使う想定です。
 
