@@ -4,6 +4,21 @@ set -euo pipefail
 repo_root="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
 cd "${repo_root}"
 
+if [[ -z "${COMPOSE_PROJECT_NAME:-}" ]]; then
+    workspace_owner_raw="${USER:-default}"
+    workspace_owner="$(
+        printf '%s' "${workspace_owner_raw}" \
+            | tr '[:upper:]' '[:lower:]' \
+            | sed -E 's/[^a-z0-9]+/-/g; s/^-+//; s/-+$//'
+    )"
+
+    if [[ -z "${workspace_owner}" ]]; then
+        workspace_owner="default"
+    fi
+
+    export COMPOSE_PROJECT_NAME="copilot-workspace-${workspace_owner}"
+fi
+
 if gh auth status >/dev/null 2>&1; then
     export COPILOT_HOST_GH_TOKEN
     COPILOT_HOST_GH_TOKEN="$(gh auth token)"
