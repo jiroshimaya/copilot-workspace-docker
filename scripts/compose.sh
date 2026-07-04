@@ -4,6 +4,13 @@ set -euo pipefail
 repo_root="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
 cd "${repo_root}"
 
+if [[ -f "${repo_root}/.env.local" ]]; then
+    set -a
+    # shellcheck disable=SC1091
+    source "${repo_root}/.env.local"
+    set +a
+fi
+
 if [[ -z "${COMPOSE_PROJECT_NAME:-}" ]]; then
     workspace_owner_raw="${USER:-default}"
     workspace_owner="$(
@@ -36,8 +43,20 @@ fi
 cmd="${1:-}"
 shift || true
 
+workspace_dockerfile="${WORKSPACE_DOCKERFILE:-Dockerfile}"
+workspace_base_image="${WORKSPACE_BASE_IMAGE:-copilot-workspace-docker/workspace-base:local}"
+
 case "${cmd}" in
     build)
+        if [[ "${workspace_dockerfile}" != "Dockerfile" ]]; then
+            docker build \
+                --network host \
+                --build-arg "COPILOT_CLI_VERSION=${COPILOT_CLI_VERSION:-latest}" \
+                --build-arg "ENABLE_PASSWORDLESS_SUDO=${ENABLE_PASSWORDLESS_SUDO:-0}" \
+                -f "${repo_root}/Dockerfile" \
+                -t "${workspace_base_image}" \
+                "${repo_root}"
+        fi
         exec docker compose -f "${repo_root}/compose.yaml" build "$@"
         ;;
     up)

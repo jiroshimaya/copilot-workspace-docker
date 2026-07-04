@@ -2,10 +2,12 @@ services:
   workspace:
     build:
       context: .
-      dockerfile: Dockerfile
+      dockerfile: "${WORKSPACE_DOCKERFILE:-Dockerfile}"
       network: host
       args:
         COPILOT_CLI_VERSION: "${COPILOT_CLI_VERSION:-latest}"
+        ENABLE_PASSWORDLESS_SUDO: "${ENABLE_PASSWORDLESS_SUDO:-0}"
+        WORKSPACE_BASE_IMAGE: "${WORKSPACE_BASE_IMAGE:-copilot-workspace-docker/workspace-base:local}"
     image: copilot-workspace-docker/workspace:local
     init: true
     stdin_open: true
