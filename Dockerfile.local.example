@@ -1,0 +1,9 @@
+ARG WORKSPACE_BASE_IMAGE=copilot-workspace-docker/workspace-base:local
+FROM ${WORKSPACE_BASE_IMAGE}
+
+USER root
+
+# Add host-specific packages or tools here.
+# RUN apt-get update && apt-get install -y --no-install-recommends tree && rm -rf /var/lib/apt/lists/*
+
+USER copilot

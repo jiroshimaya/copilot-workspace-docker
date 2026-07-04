@@ -41,6 +41,19 @@ GitHub Copilot CLI をホストへ直接入れずに試すための、Docker ベ
 
 BuildKit 環境によっては build 時だけ DNS 解決に失敗することがあるため、この `compose.yaml` では `build.network: host` を指定しています。これは build 中のネットワーク経路だけをホスト側へ寄せる回避策です。
 
+ホスト固有の build 設定を足したい場合は、ignore 対象の `.env.local` と `Dockerfile.local` を使えます。
+
+```bash
+cp .env.local.example .env.local
+cp Dockerfile.local.example Dockerfile.local
+```
+
+`.env.local` は `./scripts/compose.sh` が自動で読み込みます。`WORKSPACE_DOCKERFILE=Dockerfile.local` を指定すると、`build` 時にまず既定の `Dockerfile` から base image を作り、その上へ `Dockerfile.local` を重ねて workspace image を作ります。
+
+```bash
+WORKSPACE_DOCKERFILE=Dockerfile.local ./scripts/compose.sh build
+```
+
 project 名を明示的に変えたい場合は、`COMPOSE_PROJECT_NAME` を指定してください。未指定時は `./scripts/compose.sh` が `USER` をもとに安全な文字へ正規化した名前を使います。`docker compose` を直接使う場合も、同じ分離をしたければ `COMPOSE_PROJECT_NAME` を明示してください。
 
 `./scripts/compose.sh zellij` はコンテナ内で `workspace` セッションへの attach を試し、既存セッションがなければ同名の新規セッションを起動します。作業を再開したいときは `exec` よりこちらを使うと、前回の `zellij` セッションへすぐ戻れます。
@@ -82,6 +95,14 @@ tree --version
 
 `root` は明示的に要求したときだけ使える導線です。通常作業は引き続き `copilot` ユーザーの `exec` / `zellij` を使う前提です。また、ここで行った `apt-get` の変更はコンテナの writable layer に入るため、`docker compose down` や image rebuild の扱いによっては失われる点に注意してください。
 
+passwordless sudo を使いたい場合は build 時に `ENABLE_PASSWORDLESS_SUDO=1` を指定してください。既定値は無効です。
+
+```bash
+ENABLE_PASSWORDLESS_SUDO=1 ./scripts/compose.sh build
+```
+
+この設定を有効にすると、`copilot` ユーザーは `sudo` で root 権限のコマンドを実行できます。利便性は上がりますが、通常の非 root 運用よりも安全性は下がります。
+
 ## 含めているツール
 
 - `copilot-cli`
@@ -111,6 +132,7 @@ COPILOT_CLI_VERSION=latest ./scripts/compose.sh build
 ## 認証情報とセキュリティ方針
 
 - コンテナは root ではなく `copilot` ユーザーで動かします
+- `ENABLE_PASSWORDLESS_SUDO=1` を指定した build では、`copilot` ユーザーへ passwordless sudo を付与できます
 - 永続化対象は Docker 管理の `copilot-workspace-$USER` project 配下の volume に限定します
 - ホストのリポジトリ、`~/.config/gh`、`~/.copilot`、`~/.gitconfig`、`~/.ssh` は既定ではコンテナへ持ち込みません
 - ホスト側で `gh auth login` 済みなら、helper script が token だけを取り出して起動時にコンテナ側 `gh` へ再ログインさせます
