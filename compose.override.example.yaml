@@ -1,0 +1,10 @@
+services:
+  workspace:
+    # Example: restrict publish to localhost only on this host.
+    # ports:
+    #   - "127.0.0.1:4173:4173"
+    #   - "127.0.0.1:8001:8001"
+    environment:
+      # Example: per-host env overrides.
+      # ANTHROPIC_API_KEY: "${ANTHROPIC_API_KEY:-}"
+      {}

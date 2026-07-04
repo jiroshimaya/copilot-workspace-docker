@@ -4,6 +4,13 @@ set -euo pipefail
 repo_root="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
 cd "${repo_root}"
 
+if [[ -f "${repo_root}/.env.local" ]]; then
+    set -a
+    # shellcheck disable=SC1091
+    source "${repo_root}/.env.local"
+    set +a
+fi
+
 if [[ -z "${COMPOSE_PROJECT_NAME:-}" ]]; then
     workspace_owner_raw="${USER:-default}"
     workspace_owner="$(

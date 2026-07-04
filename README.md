@@ -41,6 +41,26 @@ GitHub Copilot CLI をホストへ直接入れずに試すための、Docker ベ
 
 BuildKit 環境によっては build 時だけ DNS 解決に失敗することがあるため、この `compose.yaml` では `build.network: host` を指定しています。これは build 中のネットワーク経路だけをホスト側へ寄せる回避策です。
 
+workspace は既定で `4173/tcp` と `8001/tcp` をホストへ publish します。コンテナ内で Vite dev server や FastAPI を `0.0.0.0` に bind して起動すれば、ホストや同一 LAN 上の別端末から `http://<host>:4173` / `http://<host>:8001` で確認できます。
+
+ホスト固有の調整は、リポジトリ管理下の `compose.yaml` を直接書き換える代わりにローカル override で行えます。
+
+```bash
+cp .env.local.example .env.local
+cp compose.override.example.yaml compose.override.yaml
+```
+
+`.env.local` は `./scripts/compose.sh` が自動で読み込みます。たとえば公開ポートや CLI バージョンをホストごとに変えられます。
+
+```bash
+COPILOT_WORKSPACE_FRONTEND_PORT=4173
+COPILOT_WORKSPACE_BACKEND_PORT=8001
+COPILOT_CLI_VERSION=latest
+CLAUDE_CODE_VERSION=latest
+```
+
+`compose.override.yaml` は Docker Compose 標準の override ファイルです。listen 先や publish 条件を host ごとに変えたいときに使ってください。
+
 project 名を明示的に変えたい場合は、`COMPOSE_PROJECT_NAME` を指定してください。未指定時は `./scripts/compose.sh` が `USER` をもとに安全な文字へ正規化した名前を使います。`docker compose` を直接使う場合も、同じ分離をしたければ `COMPOSE_PROJECT_NAME` を明示してください。
 
 `./scripts/compose.sh zellij` はコンテナ内で `workspace` セッションへの attach を試し、既存セッションがなければ同名の新規セッションを起動します。作業を再開したいときは `exec` よりこちらを使うと、前回の `zellij` セッションへすぐ戻れます。
@@ -85,6 +105,7 @@ tree --version
 ## 含めているツール
 
 - `copilot-cli`
+- `claude-code`
 - `gh`
 - `git`
 - `libreoffice`
@@ -94,7 +115,7 @@ tree --version
 - `bash`
 - `zellij`
 
-`copilot-cli` は npm パッケージ `@github/copilot` からインストールします。バージョンを固定したい場合は build 時に `COPILOT_CLI_VERSION` を渡してください。
+`copilot-cli` は npm パッケージ `@github/copilot`、`claude-code` は npm パッケージ `@anthropic-ai/claude-code` からインストールします。バージョンを固定したい場合は build 時に `COPILOT_CLI_VERSION` と `CLAUDE_CODE_VERSION` を使ってください。
 
 対話シェルでは、ホストの `~/.bashrc` に合わせて `BASH_ENV="$HOME/.bashexports"` を設定し、次の alias も入れています。
 
@@ -105,13 +126,14 @@ alias copilot='copilot --allow-all-tools --allow-all-paths --bash-env=on'
 ```
 
 ```bash
-COPILOT_CLI_VERSION=latest ./scripts/compose.sh build
+COPILOT_CLI_VERSION=latest CLAUDE_CODE_VERSION=latest ./scripts/compose.sh build
 ```
 
 ## 認証情報とセキュリティ方針
 
 - コンテナは root ではなく `copilot` ユーザーで動かします
 - 永続化対象は Docker 管理の `copilot-workspace-$USER` project 配下の volume に限定します
+- `~/.copilot` に加えて `~/.claude`、`~/.config/claude`、`~/.local/share/claude` も volume で永続化します
 - ホストのリポジトリ、`~/.config/gh`、`~/.copilot`、`~/.gitconfig`、`~/.ssh` は既定ではコンテナへ持ち込みません
 - ホスト側で `gh auth login` 済みなら、helper script が token だけを取り出して起動時にコンテナ側 `gh` へ再ログインさせます
 - コンテナ起動時には `gh auth setup-git` も実行し、コンテナ内の Git 操作でも `gh` の認証設定を使えるようにします
