@@ -52,6 +52,7 @@ case "${cmd}" in
             docker build \
                 --network host \
                 --build-arg "COPILOT_CLI_VERSION=${COPILOT_CLI_VERSION:-latest}" \
+                --build-arg "CLAUDE_CODE_VERSION=${CLAUDE_CODE_VERSION:-latest}" \
                 --build-arg "ENABLE_PASSWORDLESS_SUDO=${ENABLE_PASSWORDLESS_SUDO:-0}" \
                 -f "${repo_root}/Dockerfile" \
                 -t "${workspace_base_image}" \

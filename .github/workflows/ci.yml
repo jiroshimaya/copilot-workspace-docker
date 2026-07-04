@@ -37,7 +37,7 @@ jobs:
             test "$PWD" = "/home/copilot/development"
             test "$DEVELOPMENT_DIR" = "/home/copilot/development"
             test -d "$HOME/development/worktrees"
-            command -v bash tmux zellij gh git uv copilot sudo
+            command -v bash tmux zellij gh git uv copilot claude sudo
             alias copilot
             if sudo -n true; then
               exit 1

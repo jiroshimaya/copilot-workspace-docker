@@ -4,6 +4,7 @@ ARG USERNAME=copilot
 ARG USER_UID=1000
 ARG USER_GID=1000
 ARG COPILOT_CLI_VERSION=latest
+ARG CLAUDE_CODE_VERSION=latest
 ARG ENABLE_PASSWORDLESS_SUDO=0
 ARG ZELLIJ_VERSION=0.44.1
 
@@ -59,6 +60,7 @@ RUN curl -fsSL https://deb.nodesource.com/setup_22.x | bash - \
     && apt-get update \
     && apt-get install -y --no-install-recommends gh nodejs \
     && npm install -g "@github/copilot@${COPILOT_CLI_VERSION}" \
+    && npm install -g "@anthropic-ai/claude-code@${CLAUDE_CODE_VERSION}" \
     && npm cache clean --force \
     && rm -rf /var/lib/apt/lists/*
 
@@ -77,7 +79,14 @@ RUN if [[ "${ENABLE_PASSWORDLESS_SUDO}" == "1" ]]; then \
         && chmod 0440 "/etc/sudoers.d/${USERNAME}"; \
     fi
 
-RUN mkdir -p "${DEVELOPMENT_DIR}" "${DEVELOPMENT_DIR}"/worktrees /home/"${USERNAME}"/.config/gh /home/"${USERNAME}"/.copilot \
+RUN mkdir -p \
+        "${DEVELOPMENT_DIR}" \
+        "${DEVELOPMENT_DIR}"/worktrees \
+        /home/"${USERNAME}"/.config/gh \
+        /home/"${USERNAME}"/.config/claude \
+        /home/"${USERNAME}"/.copilot \
+        /home/"${USERNAME}"/.claude \
+        /home/"${USERNAME}"/.local/share/claude \
     && touch /home/"${USERNAME}"/.bashrc \
     && printf "%s\n" \
         "export BASH_ENV=\"\$HOME/.bashexports\"" \

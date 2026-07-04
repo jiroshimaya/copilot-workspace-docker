@@ -7,7 +7,14 @@ copilot_instructions_source="/usr/local/share/copilot-workspace/copilot-instruct
 copilot_instructions_target="${copilot_config_dir}/copilot-instructions.md"
 bashexports_path="${HOME}/.bashexports"
 
-mkdir -p "${HOME}/.config/gh" "${HOME}/.config/uv" "${copilot_config_dir}" "${development_dir}"
+mkdir -p \
+    "${HOME}/.claude" \
+    "${HOME}/.config/claude" \
+    "${HOME}/.config/gh" \
+    "${HOME}/.config/uv" \
+    "${HOME}/.local/share/claude" \
+    "${copilot_config_dir}" \
+    "${development_dir}"
 
 if [[ ! -f "${HOME}/.config/uv/uv.toml" ]]; then
     printf 'native-tls = true\n' > "${HOME}/.config/uv/uv.toml"

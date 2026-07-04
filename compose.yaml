@@ -6,6 +6,7 @@ services:
       network: host
       args:
         COPILOT_CLI_VERSION: "${COPILOT_CLI_VERSION:-latest}"
+        CLAUDE_CODE_VERSION: "${CLAUDE_CODE_VERSION:-latest}"
         ENABLE_PASSWORDLESS_SUDO: "${ENABLE_PASSWORDLESS_SUDO:-0}"
         WORKSPACE_BASE_IMAGE: "${WORKSPACE_BASE_IMAGE:-copilot-workspace-docker/workspace-base:local}"
     image: copilot-workspace-docker/workspace:local
@@ -14,6 +15,9 @@ services:
     tty: true
     working_dir: /home/copilot/development
     command: ["sleep", "infinity"]
+    ports:
+      - "${COPILOT_WORKSPACE_FRONTEND_PORT:-4173}:4173"
+      - "${COPILOT_WORKSPACE_BACKEND_PORT:-8001}:8001"
     environment:
       #GH_TOKEN: "${GH_TOKEN:-}"
       #GITHUB_TOKEN: "${GITHUB_TOKEN:-}"
@@ -36,8 +40,20 @@ services:
       - type: volume
         source: copilot-cli-config
         target: /home/copilot/.copilot
+      - type: volume
+        source: claude-home-config
+        target: /home/copilot/.claude
+      - type: volume
+        source: claude-xdg-config
+        target: /home/copilot/.config/claude
+      - type: volume
+        source: claude-local-share
+        target: /home/copilot/.local/share/claude
 
 volumes:
   copilot-workspace:
   copilot-gh-config:
   copilot-cli-config:
+  claude-home-config:
+  claude-xdg-config:
+  claude-local-share:
