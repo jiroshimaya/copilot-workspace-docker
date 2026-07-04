@@ -5,6 +5,7 @@ ARG USER_UID=1000
 ARG USER_GID=1000
 ARG COPILOT_CLI_VERSION=latest
 ARG CLAUDE_CODE_VERSION=latest
+ARG ENABLE_PASSWORDLESS_SUDO=0
 ARG ZELLIJ_VERSION=0.44.1
 
 ENV DEBIAN_FRONTEND=noninteractive \
@@ -32,6 +33,7 @@ RUN apt-get update \
         nano \
         openssh-client \
         procps \
+        sudo \
         tmux \
         zsh \
     && rm -rf /var/lib/apt/lists/*
@@ -71,6 +73,11 @@ RUN groupadd --gid "${USER_GID}" "${USERNAME}" \
         --create-home \
         --shell /bin/bash \
         "${USERNAME}"
+
+RUN if [[ "${ENABLE_PASSWORDLESS_SUDO}" == "1" ]]; then \
+        printf '%s ALL=(ALL) NOPASSWD:ALL\n' "${USERNAME}" > "/etc/sudoers.d/${USERNAME}" \
+        && chmod 0440 "/etc/sudoers.d/${USERNAME}"; \
+    fi
 
 RUN mkdir -p \
         "${DEVELOPMENT_DIR}" \

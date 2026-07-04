@@ -43,8 +43,21 @@ fi
 cmd="${1:-}"
 shift || true
 
+workspace_dockerfile="${WORKSPACE_DOCKERFILE:-Dockerfile}"
+workspace_base_image="${WORKSPACE_BASE_IMAGE:-copilot-workspace-docker/workspace-base:local}"
+
 case "${cmd}" in
     build)
+        if [[ "${workspace_dockerfile}" != "Dockerfile" ]]; then
+            docker build \
+                --network host \
+                --build-arg "COPILOT_CLI_VERSION=${COPILOT_CLI_VERSION:-latest}" \
+                --build-arg "CLAUDE_CODE_VERSION=${CLAUDE_CODE_VERSION:-latest}" \
+                --build-arg "ENABLE_PASSWORDLESS_SUDO=${ENABLE_PASSWORDLESS_SUDO:-0}" \
+                -f "${repo_root}/Dockerfile" \
+                -t "${workspace_base_image}" \
+                "${repo_root}"
+        fi
         exec docker compose -f "${repo_root}/compose.yaml" build "$@"
         ;;
     up)

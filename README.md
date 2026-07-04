@@ -48,19 +48,28 @@ workspace は既定で `4173/tcp` と `8001/tcp` をホストへ publish しま�
 ```bash
 cp .env.local.example .env.local
 cp compose.override.example.yaml compose.override.yaml
+cp Dockerfile.local.example Dockerfile.local
 ```
 
-`.env.local` は `./scripts/compose.sh` が自動で読み込みます。たとえば公開ポートや CLI バージョンをホストごとに変えられます。
+`.env.local` は `./scripts/compose.sh` が自動で読み込みます。たとえば公開ポートや CLI バージョン、sudo 設定をホストごとに変えられます。
 
 ```bash
 COPILOT_WORKSPACE_FRONTEND_PORT=4173
 COPILOT_WORKSPACE_BACKEND_PORT=8001
 COPILOT_CLI_VERSION=latest
 CLAUDE_CODE_VERSION=latest
+ENABLE_PASSWORDLESS_SUDO=1
 ```
 
 `compose.override.yaml` は Docker Compose 標準の override ファイルです。listen 先や publish 条件を host ごとに変えたいときに使ってください。
 
+ホスト固有の build 設定を足したい場合は、ignore 対象の `.env.local` と `Dockerfile.local` を使えます。
+
+`.env.local` は `./scripts/compose.sh` が自動で読み込みます。`WORKSPACE_DOCKERFILE=Dockerfile.local` を指定すると、`build` 時にまず既定の `Dockerfile` から base image を作り、その上へ `Dockerfile.local` を重ねて workspace image を作ります。
+
+```bash
+WORKSPACE_DOCKERFILE=Dockerfile.local ./scripts/compose.sh build
+```
 project 名を明示的に変えたい場合は、`COMPOSE_PROJECT_NAME` を指定してください。未指定時は `./scripts/compose.sh` が `USER` をもとに安全な文字へ正規化した名前を使います。`docker compose` を直接使う場合も、同じ分離をしたければ `COMPOSE_PROJECT_NAME` を明示してください。
 
 `./scripts/compose.sh zellij` はコンテナ内で `workspace` セッションへの attach を試し、既存セッションがなければ同名の新規セッションを起動します。作業を再開したいときは `exec` よりこちらを使うと、前回の `zellij` セッションへすぐ戻れます。
@@ -102,6 +111,14 @@ tree --version
 
 `root` は明示的に要求したときだけ使える導線です。通常作業は引き続き `copilot` ユーザーの `exec` / `zellij` を使う前提です。また、ここで行った `apt-get` の変更はコンテナの writable layer に入るため、`docker compose down` や image rebuild の扱いによっては失われる点に注意してください。
 
+passwordless sudo を使いたい場合は build 時に `ENABLE_PASSWORDLESS_SUDO=1` を指定してください。既定値は無効です。
+
+```bash
+ENABLE_PASSWORDLESS_SUDO=1 ./scripts/compose.sh build
+```
+
+この設定を有効にすると、`copilot` ユーザーは `sudo` で root 権限のコマンドを実行できます。利便性は上がりますが、通常の非 root 運用よりも安全性は下がります。
+
 ## 含めているツール
 
 - `copilot-cli`
@@ -132,6 +149,7 @@ COPILOT_CLI_VERSION=latest CLAUDE_CODE_VERSION=latest ./scripts/compose.sh build
 ## 認証情報とセキュリティ方針
 
 - コンテナは root ではなく `copilot` ユーザーで動かします
+- `ENABLE_PASSWORDLESS_SUDO=1` を指定した build では、`copilot` ユーザーへ passwordless sudo を付与できます
 - 永続化対象は Docker 管理の `copilot-workspace-$USER` project 配下の volume に限定します
 - `~/.copilot` に加えて `~/.claude`、`~/.config/claude`、`~/.local/share/claude` も volume で永続化します
 - ホストのリポジトリ、`~/.config/gh`、`~/.copilot`、`~/.gitconfig`、`~/.ssh` は既定ではコンテナへ持ち込みません
